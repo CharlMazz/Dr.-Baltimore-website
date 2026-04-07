@@ -1,0 +1,147 @@
+import React, { useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { Play, Pause, Volume2, VolumeX, Share2, Heart, MessageCircle } from 'lucide-react';
+
+export default function GluteCamps() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const togglePlay = async () => {
+    if (videoRef.current) {
+      try {
+        if (isPlaying) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          await videoRef.current.play();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        // Handle the interruption error silently as it's a known browser behavior
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error("Video play error:", error);
+        }
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  return (
+    <section id="glute-camps" className="py-16 md:py-24 bg-black overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Video Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="relative group rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-primary/10 order-2 lg:order-1"
+          >
+            <div className="aspect-[9/16] md:aspect-video lg:aspect-[4/5] relative cursor-pointer" onClick={togglePlay}>
+              <video
+                ref={videoRef}
+                autoPlay
+                loop
+                muted={isMuted}
+                playsInline
+                className="w-full h-full object-cover"
+              >
+                <source src="/media/video 2.mp4" type="video/mp4" />
+              </video>
+
+              {/* Controls Overlay */}
+              <div className="absolute bottom-6 right-6 flex items-center space-x-3 z-20">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+                  className="bg-black/50 backdrop-blur-md p-3 md:p-4 rounded-full text-white hover:bg-primary transition-colors"
+                >
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="bg-primary p-3 md:p-4 rounded-full text-white hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                >
+                  {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                </button>
+              </div>
+
+              {/* Center Play Button */}
+              {!isPlaying && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+                >
+                  <div className="bg-primary/80 backdrop-blur-xl p-8 rounded-full border border-white/20 shadow-2xl">
+                    <Play size={40} className="text-white fill-white ml-1" />
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Text Side */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="order-1 lg:order-2"
+          >
+            <span className="text-primary font-black uppercase tracking-[0.3em] text-xs md:text-sm mb-4 block">Update</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 tracking-tighter italic text-3d">
+              GLUTE <span className="text-primary text-3d-primary">CAMPS</span>
+            </h2>
+            
+            <div className="space-y-6 text-white/80 text-base md:text-lg leading-relaxed font-medium">
+              <p>
+                Starting these glute camps might have been one of the best decisions I made all year. I ain’t gonna lie, we have not missed once. Every single camp has been straight gas and y’all been showing up every time.
+              </p>
+              <p className="text-white">
+                <span className="text-primary font-black">April is officially sold out.</span> We even started adding Sunday sessions for y’all because the demand been crazy. We got glute camp this weekend on Saturday and Sunday, but we have not booked any more Sundays after that.
+              </p>
+              <p>
+                So if y’all want another Sunday group camp for next week on the 19th, let me know in the comments because the 12th is completely sold out.
+              </p>
+              <p className="italic text-white/60 text-sm md:text-base border-l-4 border-primary pl-6 py-2">
+                "We building something real and once the new gym opens next month, we taking these glute camps to a whole different level."
+              </p>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-6 items-center">
+              <div className="flex items-center gap-4">
+                <motion.button whileHover={{ scale: 1.1 }} className="flex items-center gap-2 text-white/60 hover:text-primary transition-colors">
+                  <Heart size={20} />
+                  <span className="text-sm font-bold">Support</span>
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.1 }} className="flex items-center gap-2 text-white/60 hover:text-primary transition-colors">
+                  <MessageCircle size={20} />
+                  <span className="text-sm font-bold">Comment</span>
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.1 }} className="flex items-center gap-2 text-white/60 hover:text-primary transition-colors">
+                  <Share2 size={20} />
+                  <span className="text-sm font-bold">Share</span>
+                </motion.button>
+              </div>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-black px-8 py-3 rounded-2xl font-black uppercase tracking-tighter hover:bg-primary hover:text-white transition-all text-sm"
+              >
+                Join the Waitlist
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

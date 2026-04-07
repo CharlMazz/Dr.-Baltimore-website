@@ -1,0 +1,168 @@
+import React, { useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+
+export default function VideoShowcase() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const togglePlay = async () => {
+    if (videoRef.current) {
+      try {
+        if (isPlaying) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          await videoRef.current.play();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        // Handle the interruption error silently as it's a known browser behavior
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error("Video play error:", error);
+        }
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const points = [
+    {
+      title: "1️⃣ Exercise Intensity",
+      text: "Not how tired you feel how close you train to true muscular failure with control and intent."
+    },
+    {
+      title: "2️⃣ Exercise Selection",
+      text: "Every exercise has a purpose. Random lifts = random results. The right movements load the muscle, not just move weight."
+    },
+    {
+      title: "3️⃣ Exercise Value",
+      text: "Are you training the muscle where it’s strongest and weakest? Short vs lengthened positions matter. Strength curves matter. Most people never tap into this."
+    },
+    {
+      title: "4️⃣ Exercise Order",
+      text: "What you do first determines what actually grows. Poor sequencing = redundant training and stalled development."
+    }
+  ];
+
+  return (
+    <section className="py-16 md:py-24 bg-[#050505] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-12 md:mb-16">
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-primary font-black uppercase tracking-[0.3em] text-xs md:text-sm mb-4 block"
+          >
+            Core Philosophy
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-4xl md:text-7xl font-black text-white italic tracking-tighter text-3d"
+          >
+            THE <span className="text-primary text-3d-primary">BLUEPRINT</span>
+          </motion.h2>
+        </div>
+
+        <div className="relative group rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-primary/5">
+          {/* Video Container */}
+          <div className="aspect-video relative cursor-pointer" onClick={togglePlay}>
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/media/video 1.mp4" type="video/mp4" />
+            </video>
+            
+            {/* Overlay Gradient - Hidden on mobile to show text below */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none hidden md:block"></div>
+
+            {/* Content Overlay - Desktop Only */}
+            <div className="absolute inset-0 hidden md:flex items-center p-8 md:p-16 pointer-events-none">
+              <div className="max-w-xl space-y-8">
+                {points.map((point, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.2, duration: 0.8, ease: "easeOut" }}
+                    className="space-y-2"
+                  >
+                    <h3 className="text-primary font-black text-xl md:text-2xl italic tracking-tight">
+                      {point.title}
+                    </h3>
+                    <p className="text-white/70 text-sm md:text-base leading-relaxed font-medium">
+                      {point.text}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Controls Overlay */}
+            <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 flex items-center space-x-2 md:space-x-4 z-20">
+              <button 
+                onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+                className="bg-black/50 backdrop-blur-md p-3 md:p-4 rounded-full text-white hover:bg-primary transition-colors"
+              >
+                {isMuted ? <VolumeX size={18} className="md:w-6 md:h-6" /> : <Volume2 size={18} className="md:w-6 md:h-6" />}
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                className="bg-primary p-3 md:p-4 rounded-full text-white hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+              >
+                {isPlaying ? <Pause size={18} className="md:w-6 md:h-6" /> : <Play size={18} className="md:w-6 md:h-6" />}
+              </button>
+            </div>
+
+            {/* Center Play Button (Visible when paused) */}
+            {!isPlaying && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <div className="bg-primary/80 backdrop-blur-xl p-6 md:p-10 rounded-full border border-white/20 shadow-2xl">
+                  <Play size={32} className="md:w-12 md:h-12 text-white fill-white ml-1 md:ml-2" />
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Mobile Content - Visible only on small screens */}
+          <div className="md:hidden bg-zinc-900/50 p-8 space-y-8">
+            {points.map((point, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="space-y-2"
+              >
+                <h3 className="text-primary font-black text-xl italic tracking-tight">
+                  {point.title}
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed font-medium">
+                  {point.text}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
